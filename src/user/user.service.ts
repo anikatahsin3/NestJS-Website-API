@@ -31,31 +31,18 @@ export class UserService extends TypeOrmQueryService<User> {
             "users.id",
             "users.name",
             "users.email",
-            "users.designation",
             "users.phone",
             "users.address",
             "users.employee_id",
-            "role.id",
-            "role.title"
         ]);
-        userQueryBuilder.leftJoin("users.userRole", "role")
-		if (query.designation) {
-			userQueryBuilder.andWhere("users.designation like :designation", { designation: `%${query.designation}%` });
-		}
+
 		if (query.email) {
 			userQueryBuilder.andWhere("users.email like :email", { email: `%${query.email}%` });
 		}
 		if (query.name) {
 			userQueryBuilder.andWhere("users.name like :name", { name: `%${query.name}%` });
 		}
-		if (query.role_id) {
-			userQueryBuilder.andWhere("role.id = :roleId", { roleId: query.role_id });
-		}
 		const users = userQueryBuilder.getRawMany();
-		(await users).map((user) => {
-			user.user_type = USER_CONSTANTS.USER_TYPE_TITLE[user.users_role];
-			delete user.users_role;
-		});
 
 		return users;
 	}
@@ -112,19 +99,6 @@ export class UserService extends TypeOrmQueryService<User> {
 
 
     }
-    async findPermissionList(id:number){
-        const permissionList= await this.userRepository.createQueryBuilder('users')
-        .select([
-           'permissions.title AS title'
-        ])
-        .leftJoin('users.permission_groups','permission_groups')
-        .leftJoin('permission_groups.permissions','permissions')
-        .andWhere('users.id= :id',{id:id})
-        .getRawMany()
-        const list =permissionList.map(obj => obj.title)
-        let unique = list.filter((item, i, ar) => ar.indexOf(item) === i);
-        return unique         
-    }
 
 	async findOne(id: number) {
 		return this.userRepository
@@ -133,16 +107,9 @@ export class UserService extends TypeOrmQueryService<User> {
                 "users.id", 
                 "users.name", 
                 "users.email", 
-                "users.designation", 
                 "users.phone", 
-                "users.address", 
-                "roles.id", 
-                "roles.title", 
-                "permission_groups.id", 
-                "permission_groups.title"
+                "users.address",
             ])
-			.leftJoin("users.userRole", "roles")
-			.leftJoin("users.permission_groups", "permission_groups")
 			.where("users.id = :id", { id: id })
 			.getOneOrFail();
 	}
@@ -155,16 +122,9 @@ export class UserService extends TypeOrmQueryService<User> {
                 "users.name", 
                 "users.email", 
                 "users.password", 
-                "users.designation", 
                 "users.phone", 
-                "users.address", 
-                "roles.id", 
-                "roles.title", 
-                "permission_groups.id", 
-                "permission_groups.title"
+                "users.address"
             ])
-			.leftJoin("users.userRole", "roles")
-			.leftJoin("users.permission_groups", "permission_groups")
 			.andWhere("users.email like :email", { email: `%${email}%` })
 			.getOneOrFail();
 	}

@@ -22,7 +22,6 @@ export class UserController {
     @HttpCode(HttpStatus.CREATED)
 	@Post()
 	async create(@Body() createUserDto: CreateUserDto, @Headers() header: HeaderDto) {
-		await this.authService.authorize("create-users-permission", header);
 		const accessorId = header.authorization
 			? this.jwtService.verify(header.authorization.split(" ")[1], jwtConstants).sub
 			: USER_CONSTANTS.USER_TYPE.SOFTWARE_ADMIN;
@@ -42,8 +41,7 @@ export class UserController {
     @HttpCode(HttpStatus.OK)
     @Put(':id/new-password')
     async updatePassword(@Param("id") id: number, @Body() body: ResetPasswordDto, @Headers() header: HeaderDto){
-        const userId = await this.authService.authorize("update-user-password-permission", header);
-        
+        const userId = null;
         
         if(userId==id){
              await this.userService.updatePassword(id,body,userId)
@@ -53,8 +51,7 @@ export class UserController {
             return response
         }
         else{
-            const otherUserId = await this.authService.authorize("update-user-password-permission", header);
-            await this.userService.updatePassword(id,body,otherUserId)
+            await this.userService.updatePassword(id,body,null)
             const response={
                 message:"Successfully changed password"   
             }
@@ -66,7 +63,6 @@ export class UserController {
     @HttpCode(HttpStatus.CREATED)
     @Post(':id/new-password-request')
     async getNewPassword(@Param("id") id: number,@Body() body: ResetPasswordDto, @Headers() header: HeaderDto){
-		await this.authService.authorize("update-user-password-permission", header);
 		const data =  await this.userService.getNewPassword(body,id)
 		const response={
             data:data,
@@ -79,7 +75,6 @@ export class UserController {
 	@HttpCode(HttpStatus.OK)
 	@Get()
 	async getAll(@Query() query: FilterUserDto, @Headers() header: HeaderDto) {
-		await this.authService.authorize("get-all-users-permission", header);
 
 		return this.userService.findAll(query);
 	}
@@ -87,31 +82,20 @@ export class UserController {
     @HttpCode(HttpStatus.OK)
 	@Get(":id")
 	async getOne(@Param("id") id: string, @Headers() header: HeaderDto) {
-		await this.authService.authorize("get-one-user-permission", header);
 
 		return this.userService.findOne(+id);
 	}
 
     @HttpCode(HttpStatus.OK)
-	@Get(":id/permission-list")
-	async findPermissionList(@Param("id") id: string, @Headers() header: HeaderDto) {
-		await this.authService.authorize("get-permission-list-permission", header);
-
-		return this.userService.findPermissionList(+id);
-	}
-
-    @HttpCode(HttpStatus.OK)
 	@Put(":id")
 	async update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto, @Headers() header: HeaderDto) {
-		const userId = await this.authService.authorize("update-user-permission", header);
 
-		return this.userService.update(+id, updateUserDto, userId);
+		return this.userService.update(+id, updateUserDto, null);
 	}
 
     @HttpCode(HttpStatus.OK)
 	@Delete(":id")
 	async remove(@Param("id") id: string, @Headers() header: HeaderDto) {
-		await this.authService.authorize("delete-users-permission", header);
 		const decoded = this.jwtService.verify(header.authorization.split(" ")[1], jwtConstants);
 		return this.userService.remove(+id, decoded);
 	}

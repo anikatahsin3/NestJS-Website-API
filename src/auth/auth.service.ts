@@ -24,7 +24,7 @@ export class AuthService {
         
         
         if (user && match) {
-            const { password, ...result } = user;
+            const { password: password, ...result } = user;
             return result;
         }
 
@@ -33,31 +33,12 @@ export class AuthService {
 
     async login(user: any) {
         const payload = { sub: user.id };
-        const permissions = await this.userService.findPermissionList(user.id)
+        // const permissions = await this.userService.findPermissionList(user.id)
         return {
             user_id: user.id,
             name: user.name,
             role_id: user.userRole ? user.userRole.id : null,
-            permission_list: [...permissions],
             access_token: this.jwtService.sign(payload)
-        }
-    }
-
-    async authorize(permission: string, @Headers() header: { authorization: string } ) {
-        if(header.authorization == null){
-            throw new UnauthorizedException("Token is missing")
-        }
-        const decoded = this.jwtService.verify(header.authorization.split(' ')[1], jwtConstants);
-        
-
-        const user: User = await this.userService.findOne(decoded.sub);
-            
-        const permissions = await this.userService.findPermissionList(decoded.sub);
-        
-        if (permissions.includes(permission)) {
-            return user.id;
-        } else {
-            throw new UnauthorizedException("User doesn't have required permission!");
         }
     }
 
