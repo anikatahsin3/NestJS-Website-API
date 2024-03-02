@@ -8,7 +8,6 @@ import {
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from 'typeorm';
-import {USER_CONSTANTS} from "../user.constants";
 
 @Entity('users')
 export class User extends BaseEntity {
@@ -31,31 +30,12 @@ export class User extends BaseEntity {
     @Column({
         type: 'varchar'
     })
-    designation: string
-
-    @Column({
-        type: 'varchar'
-    })
     phone: string
 
     @Column({
         type: 'varchar'
     })
     address: string
-
-    @Column({
-        type: 'int',
-        nullable: true,
-    })
-    employee_id: number
-
-
-    //1 = admin, 2 = accountant, 3 = general user
-    @Column({
-        type: 'int',
-        default: USER_CONSTANTS.USER_TYPE.USER
-    })
-    role: number
 
     @Column({
         type: 'varchar'

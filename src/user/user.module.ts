@@ -12,12 +12,7 @@ import {JwtService} from "@nestjs/jwt";
     providers: [UserService, JwtAuthGuard, AuthService, JwtService],
     exports: [UserService, UserModule],
     imports: [
-
         TypeOrmModule.forFeature([User]),
-        //forwardRef(() => RoleModule)
-        
-        
-        
     ]
 })
 export class UserModule {

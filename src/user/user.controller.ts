@@ -26,6 +26,8 @@ export class UserController {
 		const accessorId = header.authorization
 			? this.jwtService.verify(header.authorization.split(" ")[1], jwtConstants).sub
 			: USER_CONSTANTS.USER_TYPE.SOFTWARE_ADMIN;
+
+        
         const user = await this.userService.create(createUserDto, accessorId);
         await this.userService.updatePermissionGroup(user.id);
 
