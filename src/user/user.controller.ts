@@ -21,10 +21,8 @@ export class UserController {
 
     @HttpCode(HttpStatus.CREATED)
 	@Post()
-	async create(@Body() createUserDto: CreateUserDto, @Headers() header: HeaderDto) {
-		const accessorId = header.authorization
-			? this.jwtService.verify(header.authorization.split(" ")[1], jwtConstants).sub
-			: USER_CONSTANTS.USER_TYPE.SOFTWARE_ADMIN;
+	async create(@Body() createUserDto: CreateUserDto, ) {
+		const accessorId = 1;
 
         
         const user = await this.userService.create(createUserDto, accessorId);
@@ -38,9 +36,10 @@ export class UserController {
         return response
 	}
 
+    //Avoid this
     @HttpCode(HttpStatus.OK)
     @Put(':id/new-password')
-    async updatePassword(@Param("id") id: number, @Body() body: ResetPasswordDto, @Headers() header: HeaderDto){
+    async updatePassword(@Param("id") id: number, @Body() body: ResetPasswordDto, ){
         const userId = null;
         
         if(userId==id){
@@ -60,43 +59,42 @@ export class UserController {
 
     }
 
+    //Avoid this
     @HttpCode(HttpStatus.CREATED)
     @Post(':id/new-password-request')
-    async getNewPassword(@Param("id") id: number,@Body() body: ResetPasswordDto, @Headers() header: HeaderDto){
+    async getNewPassword(@Param("id") id: number,@Body() body: ResetPasswordDto, ){
 		const data =  await this.userService.getNewPassword(body,id)
 		const response={
             data:data,
             message:"Successfully generated results"
-
         }
         return response
     }
 
 	@HttpCode(HttpStatus.OK)
 	@Get()
-	async getAll(@Query() query: FilterUserDto, @Headers() header: HeaderDto) {
+	async getAll(@Query() query: FilterUserDto, ) {
 
 		return this.userService.findAll(query);
 	}
 
     @HttpCode(HttpStatus.OK)
 	@Get(":id")
-	async getOne(@Param("id") id: string, @Headers() header: HeaderDto) {
+	async getOne(@Param("id") id: string, ) {
 
 		return this.userService.findOne(+id);
 	}
 
     @HttpCode(HttpStatus.OK)
 	@Put(":id")
-	async update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto, @Headers() header: HeaderDto) {
+	async update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto, ) {
 
 		return this.userService.update(+id, updateUserDto, null);
 	}
 
     @HttpCode(HttpStatus.OK)
 	@Delete(":id")
-	async remove(@Param("id") id: string, @Headers() header: HeaderDto) {
-		const decoded = this.jwtService.verify(header.authorization.split(" ")[1], jwtConstants);
-		return this.userService.remove(+id, decoded);
+	async remove(@Param("id") id: string, ) {
+		return this.userService.remove(+id);
 	}
 }

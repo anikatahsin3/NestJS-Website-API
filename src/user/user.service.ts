@@ -7,7 +7,6 @@ import { User } from "./entities/user.entity";
 import * as bcrypt from "bcrypt";
 import { TypeOrmQueryService } from "@nestjs-query/query-typeorm";
 import { FilterUserDto } from "./dto/validate-user.dto";
-import { USER_CONSTANTS } from "./user.constants";
 import { ResetPasswordDto } from "./dto/reset-pass.dto";
 
 @Injectable()
@@ -33,7 +32,6 @@ export class UserService extends TypeOrmQueryService<User> {
             "users.email",
             "users.phone",
             "users.address",
-            "users.employee_id",
         ]);
 
 		if (query.email) {
@@ -145,9 +143,8 @@ export class UserService extends TypeOrmQueryService<User> {
 	 }
     
 
-	async remove(id: number, decodedJson) {
+	async remove(id: number) {
 		const voucher = await this.userRepository.createQueryBuilder("users").where("users.id = :id", { id: id }).getOne();
-		voucher.updated_by = decodedJson.sub;
 		let voucherPromise = await this.userRepository.save(voucher);
 		return voucherPromise.softRemove();
 	}
